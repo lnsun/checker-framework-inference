@@ -212,6 +212,12 @@ public class InferenceVisitor<Checker extends InferenceChecker,
     }
 
     public void mainIsSubtype(AnnotatedTypeMirror ty, AnnotationMirror mod, String msgkey, Tree node) {
+        if (!mainIsSubtype(ty, mod)) {
+            checker.report(Result.failure(msgkey, ty.getAnnotations().toString(), ty.toString(), node.toString()), node);
+        }
+    }
+
+    public boolean mainIsSubtype(AnnotatedTypeMirror ty, AnnotationMirror mod) {
         if (infer) {
 
             final SlotManager slotManager = InferenceMain.getInstance().getSlotManager();
@@ -228,9 +234,11 @@ public class InferenceVisitor<Checker extends InferenceChecker,
             }
         } else {
             if (!ty.hasEffectiveAnnotation(mod)) {
-                checker.report(Result.failure(msgkey, ty.getAnnotations().toString(), ty.toString(), node.toString()), node);
+                return false;
             }
         }
+        // always return true when infer
+        return true;
     }
 
     public void mainIsNot(AnnotatedTypeMirror ty, AnnotationMirror mod, String msgkey, Tree node) {
