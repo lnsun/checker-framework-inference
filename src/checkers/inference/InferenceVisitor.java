@@ -217,6 +217,13 @@ public class InferenceVisitor<Checker extends InferenceChecker,
         }
     }
 
+    /**
+     * Non-reporting version of mainIsSubtype, leaving the freedom for invoker to determine how to report errors.
+     * <p>Use with caution: constraints are always generated during inference as side-effect!</p>
+     * @param ty type
+     * @param mod qualifier
+     * @return true during inference or is subtype in type checking; false if not subtype in type checking
+     */
     public boolean mainIsSubtype(AnnotatedTypeMirror ty, AnnotationMirror mod) {
         if (infer) {
 
