@@ -240,7 +240,7 @@ public class InferenceVisitor<Checker extends InferenceChecker,
                 }
             }
         } else {
-            if (!ty.hasEffectiveAnnotation(mod)) {
+            if (!ty.hasEffectiveAnnotation(mod)) { // FIXME hiarachy
                 return false;
             }
         }
