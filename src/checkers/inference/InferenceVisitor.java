@@ -14,6 +14,7 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedTypeVari
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedUnionType;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedWildcardType;
 import org.checkerframework.framework.type.AnnotatedTypeParameterBounds;
+import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.util.AnnotatedTypes;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
@@ -214,7 +215,8 @@ public class InferenceVisitor<Checker extends InferenceChecker,
                 }
             }
         } else {
-            if (!ty.hasEffectiveAnnotation(mod)) {
+            QualifierHierarchy hierarchy = atypeFactory.getQualifierHierarchy();
+            if (!hierarchy.isSubtype(ty.getAnnotationInHierarchy(mod), mod)) {
                 checker.report(Result.failure(msgkey, ty.getAnnotations().toString(), ty.toString(), node.toString()), node);
             }
         }
