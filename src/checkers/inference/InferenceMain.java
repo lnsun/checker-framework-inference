@@ -28,6 +28,7 @@ import checkers.inference.model.VariableSlot;
 import checkers.inference.qual.VarAnnot;
 import checkers.inference.util.InferenceUtil;
 import checkers.inference.util.JaifBuilder;
+import org.checkerframework.javacutil.PluginUtil;
 
 /**
  * InferenceMain is the central coordinator to the inference system.
@@ -162,9 +163,11 @@ public class InferenceMain {
                 "-Xmaxwarns", "1000",
                 "-Xmaxerrs", "1000",
                 "-XDignore.symbol.file",
-                "-source", "8",
-                "-target", "8",
                 "-Awarns"));
+
+        if (PluginUtil.getJreVersion() == 8) {
+            checkerFrameworkArgs.addAll(Arrays.asList("-source", "8", "-target", "8"));
+        }
 
         if (InferenceOptions.cfArgs != null) {
             checkerFrameworkArgs.addAll(parseCfArgs());
@@ -300,7 +303,7 @@ public class InferenceMain {
         if (realChecker == null) {
             try {
                 realChecker = (InferrableChecker) Class.forName(
-                        InferenceOptions.checker, true, ClassLoader.getSystemClassLoader()).newInstance();
+                        InferenceOptions.checker, true, ClassLoader.getSystemClassLoader()).getDeclaredConstructor().newInstance();
                 realChecker.init(inferenceChecker.getProcessingEnvironment());
                 realChecker.initChecker();
                 logger.finer(String.format("Created real checker: %s", realChecker));
@@ -349,7 +352,7 @@ public class InferenceMain {
     protected InferenceSolver getSolver() {
         try {
             InferenceSolver solver = (InferenceSolver) Class.forName(
-                    InferenceOptions.solver, true, ClassLoader.getSystemClassLoader()).newInstance();
+                    InferenceOptions.solver, true, ClassLoader.getSystemClassLoader()).getDeclaredConstructor().newInstance();
             logger.finer("Created solver: " + solver);
             return solver;
         } catch (Throwable e) {
@@ -403,11 +406,9 @@ public class InferenceMain {
     }
 
     public ConstraintManager getConstraintManager() {
-
-        if (constraintManager == null) {
+        if (this.constraintManager == null) {
             this.constraintManager = new ConstraintManager();
         }
-
         return constraintManager;
     }
 
