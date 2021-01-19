@@ -313,8 +313,9 @@ public class JaifBuilder {
                     	if (astRecord.methodName != null && astRecord.methodName.contains("<init>")) {
                             astRecord = new ASTRecord(astRecord.ast, astRecord.className,
                                     astRecord.methodName, astRecord.varName, ASTPathUtil.getMethodTypeASTPath());
+                        } else {
+                            continue;
                         }
-                        continue;
                     }
 
                     memberRecords.entries.add(new RecordValue(astRecord.astPath,annotation));
