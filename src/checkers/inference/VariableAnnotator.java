@@ -760,30 +760,7 @@ public class VariableAnnotator extends AnnotatedTypeScanner<Void,Tree> {
      * Visit the extends, implements, and type parameters of the given class type and tree.
      */
     protected void handleClassDeclaration(AnnotatedDeclaredType classType, ClassTree classTree) {
-        final Tree extendsTree = classTree.getExtendsClause();
-        if (extendsTree == null) {
-            // Annotated the implicit extends.
-            Element classElement = classType.getUnderlyingType().asElement();
-            VariableSlot extendsSlot;
-            if (!extendsMissingTrees.containsKey(classElement)) {
-                // TODO: SEE COMMENT ON createImpliedExtendsLocation
-                AnnotationLocation location = createImpliedExtendsLocation(classTree);
-                extendsSlot = createVariable(location);
-                extendsMissingTrees.put(classElement, extendsSlot);
-                logger.fine("Created variable for implicit extends on class:\n" +
-                        extendsSlot.getId() + " => " + classElement + " (extends Object)");
-
-            } else {
-                // Add annotation
-                extendsSlot = extendsMissingTrees.get(classElement);
-            }
-            List<AnnotatedDeclaredType> superTypes = classType.directSuperTypes();
-            superTypes.get(0).replaceAnnotation(slotManager.getAnnotation(extendsSlot));
-
-        } else {
-            final AnnotatedTypeMirror extendsType = inferenceTypeFactory.getAnnotatedTypeFromTypeTree(extendsTree);
-            visit(extendsType, extendsTree);
-        }
+        handleClassExtendsClause(classType, classTree);
 
 //        // TODO: NOT SURE THIS HANDLES MEMBER SELECT CORRECTLY
 //        int interfaceIndex = 1;
@@ -810,6 +787,40 @@ public class VariableAnnotator extends AnnotatedTypeScanner<Void,Tree> {
         Element classElement = classType.getUnderlyingType().asElement();
         storeElementType(classElement, classType);
 
+    }
+
+    protected void handleClassExtendsClause(AnnotatedDeclaredType classType, ClassTree classTree) {
+        final Tree extendsTree = classTree.getExtendsClause();
+        if (extendsTree == null) {
+            handleImplicitExtends(classType, classTree);
+        } else {
+            handleExplicitExtends(extendsTree);
+        }
+    }
+
+    protected void handleImplicitExtends(AnnotatedDeclaredType classType, ClassTree classTree) {
+        // Annotated the implicit extends.
+        Element classElement = classType.getUnderlyingType().asElement();
+        VariableSlot extendsSlot;
+        if (!extendsMissingTrees.containsKey(classElement)) {
+            // TODO: SEE COMMENT ON createImpliedExtendsLocation
+            AnnotationLocation location = createImpliedExtendsLocation(classTree);
+            extendsSlot = createVariable(location);
+            extendsMissingTrees.put(classElement, extendsSlot);
+            logger.fine("Created variable for implicit extends on class:\n" +
+                    extendsSlot.getId() + " => " + classElement + " (extends Object)");
+
+        } else {
+            // Add annotation
+            extendsSlot = extendsMissingTrees.get(classElement);
+        }
+        List<AnnotatedDeclaredType> superTypes = classType.directSuperTypes();
+        superTypes.get(0).replaceAnnotation(slotManager.getAnnotation(extendsSlot));
+    }
+
+    protected void handleExplicitExtends(Tree extendsTree) {
+        final AnnotatedTypeMirror extendsType = inferenceTypeFactory.getAnnotatedTypeFromTypeTree(extendsTree);
+        visit(extendsType, extendsTree);
     }
 
     protected void handleClassDeclarationBound(
