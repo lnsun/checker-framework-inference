@@ -1671,7 +1671,7 @@ public class VariableAnnotator extends AnnotatedTypeScanner<Void,Tree> {
         return declSlot;
     }
 
-    private void addDeclarationConstraints(VariableSlot declSlot, VariableSlot instanceSlot) {
+    protected void addDeclarationConstraints(VariableSlot declSlot, VariableSlot instanceSlot) {
         constraintManager.addSubtypeConstraint(instanceSlot, declSlot);
     }
 
