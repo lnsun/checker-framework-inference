@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * was generated for.  If the VarAnnot was generated for an implicit location then source code should be generated to
  * construct the appropriate location.
  */
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.CLASS)
 @SubtypeOf({})
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
 public @interface VarAnnot {
